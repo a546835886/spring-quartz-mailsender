@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:jee="http://www.springframework.org/schema/jee"
+       xmlns:tx="http://www.springframework.org/schema/tx" xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:task="http://www.springframework.org/schema/task"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+						http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd
+	                    http://www.springframework.org/schema/jee http://www.springframework.org/schema/jee/spring-jee.xsd
+	                    http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+	                    http://www.springframework.org/schema/task
+	                    http://www.springframework.org/schema/task/spring-task.xsd">
+
+    <!--第一步， 要执行任务的作业类-->
+    <bean id="mainTask" class="com.batch.CronJob">
+        <!--<property name="scheduler" ref="schedulerFactoryBean"></property>
+        <property name="batchTaskInfoDao" ref="batchTaskInfoDao"></property>-->
+    </bean>
+
+    <!--第二步，将要执行的任务注入到JobDetail中-->
+    <bean id="jobDetail"
+          class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+        <property name="targetObject" ref="mainTask" />
+        <!--任务中执行的方法-->
+        <property name="targetMethod" value="execute" />
+        <!--上一步未执行完，等待执行-->
+        <property name="concurrent" value="false" />
+    </bean>
+
+    <!--第三步，基本定时器，会绑定具体任务-->
+    <!-- 第一种 SimpleTriggerBean，只支持按照一定频度调用任务，如每隔30分钟运行一次。配置方式如下： -->
+    <!-- <bean id="simpleTrigger"
+        class="org.springframework.scheduling.quartz.SimpleTriggerFactoryBean">
+        <property name="jobDetail" ref="jobDetail"></property>
+        <property name="startDelay" value="3000"></property>
+        <property name="repeatInterval" value="2000"></property>
+    </bean> -->
+    <!-- 第二种 CronTriggerBean，支持到指定时间运行一次，如每天12:00运行一次等。配置方式如下 -->
+    <bean id="cornTrigger"
+          class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+        <property name="jobDetail">
+            <ref bean="jobDetail" />
+        </property>
+        <property name="cronExpression">
+            <value>0/1 * * * * ?</value>
+        </property>
+    </bean>
+
+    <!--第四步 调度工厂 -->
+    <bean id="schedulerFactoryBean"
+          class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
+        <property name="triggers">
+            <list>
+                <ref bean="cornTrigger" />
+                <!--<ref bean="simpleTrigger" />-->
+            </list>
+        </property>
+    </bean>
+</beans>

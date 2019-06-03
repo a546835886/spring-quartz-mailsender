@@ -1,0 +1,6 @@
+<component name="ArtifactManager">
+  <artifact type="exploded-war" name="quartz-spring-mailsender">
+    <output-path>$PROJECT_DIR$/out/artifacts/quartz_spring_mailsender</output-path>
+    <root id="root" />
+  </artifact>
+</component>
