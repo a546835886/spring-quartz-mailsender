@@ -11,7 +11,7 @@
     <properties>
 
         <!-- spring版本号 -->
-        <spring.version>4.2.2.RELEASE</spring.version>                      <!-- Quartz的版本 -->
+        <spring.version>5.2.20.RELEASE</spring.version>                      <!-- Quartz的版本 -->
     </properties>
     <dependencies>
         <dependency>
